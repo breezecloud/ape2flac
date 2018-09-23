@@ -51,18 +51,22 @@ def Convert_utf8(path,file):
         Exec('enca -L zh_CN -x UTF-8 "'+ os.path.join(path,file)+'"')
 
 def Convert_flac(path,file,undel_flag):
+    success_flag = False
     fname = os.path.splitext(file)[0] #无后缀文件名 
     #查询相应的cue文件
     if os.path.exists(os.path.join(path,file)+'.cue'):
         #shntool split -t "%n.%p.%t" -f test.cue -o flac test. -d output
-        Exec('shntool split -t "%n.%p.%t" -f "' + os.path.join(path,file)+'.cue"' + ' -o flac -O always "' +os.path.join(path,file)+'" -d "'+path+'"')
+        if Exec('shntool split -t "%n.%p.%t" -f "' + os.path.join(path,file)+'.cue"' + ' -o flac -O always "' +os.path.join(path,file)+'" -d "'+path+'"') == 0:
+            success_flag = True
     else:
         if os.path.exists(os.path.join(path,fname)+'.cue'): 
-            Exec('shntool split -t "%n.%p.%t" -f "'+ os.path.join(path,fname)+'.cue"' + ' -o flac -O always "' +os.path.join(path,file)+'" -d "'+path+'"')
+            if Exec('shntool split -t "%n.%p.%t" -f "'+ os.path.join(path,fname)+'.cue"' + ' -o flac -O always "' +os.path.join(path,file)+'" -d "'+path+'"') == 0:
+                success_flag = True
         elif os.path.splitext(file)[1] != '.flac' :#找不到cue文件,转换为单个文件
             # ffmpeg -i test.ape  test.flac
-            Exec('ffmpeg -i "'+os.path.join(path,file) + '" "' + os.path.join(path,fname)+'.flac"')
-    if undel_flag == False:
+            if Exec('ffmpeg -i "'+os.path.join(path,file) + '" "' + os.path.join(path,fname)+'.flac"') == 0:
+                success_flag = True
+    if (undel_flag) == False and (success_flag == True):
         os.remove(os.path.join(path,file))
 
 def main(argv):
