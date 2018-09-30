@@ -27,7 +27,7 @@ ape2flac脚本作用<br>
 ---
 
 命令格式：  
-ape2flac.py -d <directory> -h -u -n  
+ape2flac.py -d <directory> -h -e -n  
 -d --directory 需要执行的目录  
 -h --help 帮助说明  
 -e --删除转换后的文件（压缩和音频文件）  
