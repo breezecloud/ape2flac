@@ -19,7 +19,8 @@ ape2flac脚本作用<br>
 3，shntool，cue切割软件  
 4，unrar，rar解压  
 5，mac，Monkey's Audio Console，支持ape文件格式  
-6，enca，将文件转换成utf-8格式  
+6，enca，将文件转换成utf-8格式 
+7，sed，修改cue文件
 安装这些软件在aurchlinux下只要执行pacman -S ffmpeg flac shntool unrar mac enca。在debain下只要执行apt-get install是一样的，当然要观察执行结果，是不是每个软件都顺利安装在你的系统上。<br>
 
 脚本的内部流程和使用<br>
@@ -29,11 +30,11 @@ ape2flac脚本作用<br>
 ape2flac.py -d <directory> -h -u -n  
 -d --directory 需要执行的目录  
 -h --help 帮助说明  
--u --undele 不删除转换后的文件（压缩和音频文件）  
+-e --删除转换后的文件（压缩和音频文件）  
 -n --notrans 不做音频文件转换，只做解压和文本文件编码转换  
 本脚本在指定的目录中完成如下操作：  
 1，解压缩rar文件，之所以不支持zip文件，是zip格式解压出来中文文件名是乱码。  
-2，将.txt和.cue文件的编码转换成UTF-8  
+2，将.txt和.cue文件的编码转换成UTF-8,如果发现cue文件中的FILE字段和实际文件不符，修改FILE字段
 3，转换'.ape','.flac','.wav','.wv'格式的文件到.flac文件，如果同一目录下有相同文件名的cue文件，将根据cue文件生成多个文件。  
 　　第一次执行可以用-n参数，让脚本只做前面两步，然后在根据情况调整一下目录结构，如有时候太目录太深等等，根据自己情况整理成比较合适的目录结构，然后在进行实际的转换。如果没有备份，可以先用-u参数不删除转换或者解压之前的文件。<br>  
 	
