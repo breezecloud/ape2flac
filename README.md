@@ -24,15 +24,15 @@ Third party software <br>
 ---
 
 顺利运行脚本需要如下第三方软件：  
-1，ffmpeg，转换的核心程序，支持各种音视频格式。  
-2，flac，flac编码软件  
-3，shntool，cue切割软件  
-4，unrar，rar文件解压  
-5，mac，Monkey's Audio Console，支持ape文件格式  
-6，enca，将文件转换成utf-8格式 
-7，sed，修改cue文件
-8，cuetools，支持读取cue文件
-9，metaflac，支持写入flac的id[3]v2标记
+1，ffmpeg，转换的核心程序，支持各种音视频格式。 <br> 
+2，flac，flac编码软件  <br>
+3，shntool，cue切割软件  <br>
+4，unrar，rar文件解压  <br>
+5，mac，Monkey's Audio Console，支持ape文件格式  <br>
+6，enca，将文件转换成utf-8格式 <br>
+7，sed，修改cue文件<br>
+8，cuetools，支持读取cue文件<br>
+9，metaflac，支持写入flac的id[3]v2标记<br>
 1, ffmpeg, the core program of conversion, supports all kinds of audio and video formats.
 2, FLAC, FLAC encoding software
 3, shntool, cue cutting software
