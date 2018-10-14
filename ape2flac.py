@@ -83,10 +83,14 @@ def Convert_filename(cuefile,file): #cuefile中的file字段替换成file
         
 
 def get_cue_info(cuefile):#获取cue文件的信息
+    tracknames=[]
     cuefile = Validate_filename(cuefile)
     print("cueprint -d '%N' "+cuefile)
-    tracks=int(os.popen("cueprint -d '%N' "+cuefile).read())
-    tracknames=[]
+    try:
+        tracks=int(os.popen("cueprint -d '%N' "+cuefile).read())
+    except ValueError :
+        print("cueprint error in parse file:"+cuefile)
+        return tracknames
     
     for id3count in range(1,tracks+1):
         t_music = Music(
@@ -122,7 +126,8 @@ def Set_cue_flac(file,cuefile):#设置id3v2到flac文件
 def Convert_flac(file,del_flag): #转换音频文件为flac，del_flag = True 解压后删除原文件
     success_flag = False
     fname = os.path.splitext(file)[0] #无后缀文件名
-    cuefile = ""
+    cuefile = "" 
+    tracknames = []
     #查询相应的cue文件
     if os.path.exists(file+'.cue'):
         cuefile = file+'.cue'
