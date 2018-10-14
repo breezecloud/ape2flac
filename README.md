@@ -33,9 +33,6 @@ Third party software <br>
 7，sed，修改cue文件
 8，cuetools，支持读取cue文件
 9，metaflac，支持写入flac的id[3]v2标记
-安装这些软件在aurchlinux下只要执行pacman -S ffmpeg flac shntool unrar mac enca cuetool metaflac。在debain下只要执行apt-get install是一样的，当然要观察执行结果，是不是每个软件都顺利安装在你的系统上。<br>
-
-The smooth running script needs the following third party software:
 1, ffmpeg, the core program of conversion, supports all kinds of audio and video formats.
 2, FLAC, FLAC encoding software
 3, shntool, cue cutting software
@@ -45,6 +42,11 @@ The smooth running script needs the following third party software:
 7, SED, modify the cue file.
 8, cuetools, support reading cue files
 9, metaflac, supporting id[3]v2 tags written to FLAC.
+
+安装这些软件在aurchlinux下只要执行pacman -S ffmpeg flac shntool unrar mac enca cuetool metaflac。在debain下只要执行apt-get install是一样的，当然要观察执行结果，是不是每个软件都顺利安装在你的系统上。<br>
+
+The smooth running script needs the following third party software:
+
 Installing these software under aurchlinux is as long as pacman-S ffmpeg FLAC shntool Unrar MAC enca cuetool metaflac is executed. As long as the apt-get install is the same under debain, of course, to observe the results of the execution, is not every software installed smoothly on your system. <br>
 
 脚本的内部功能和使用<br>
