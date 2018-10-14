@@ -33,19 +33,18 @@ Third party software <br>
 7，sed，修改cue文件<br>
 8，cuetools，支持读取cue文件<br>
 9，metaflac，支持写入flac的id[3]v2标记<br>
-1, ffmpeg, the core program of conversion, supports all kinds of audio and video formats.
-2, FLAC, FLAC encoding software
-3, shntool, cue cutting software
-4, Unrar, rar file decompression
-5, MAC, Monkey's Audio Console, support ape file format
-6, enca, convert files to UTF-8 format.
-7, SED, modify the cue file.
-8, cuetools, support reading cue files
-9, metaflac, supporting id[3]v2 tags written to FLAC.
+The smooth running script needs the following third party software:
+1, ffmpeg, the core program of conversion, supports all kinds of audio and video formats.<br>
+2, FLAC, FLAC encoding software<br>
+3, shntool, cue cutting software<br>
+4, Unrar, rar file decompression<br>
+5, MAC, Monkey's Audio Console, support ape file format<br>
+6, enca, convert files to UTF-8 format.<br>
+7, SED, modify the cue file.<br>
+8, cuetools, support reading cue files<br>
+9, metaflac, supporting id[3]v2 tags written to FLAC.<br>
 
 安装这些软件在aurchlinux下只要执行pacman -S ffmpeg flac shntool unrar mac enca cuetool metaflac。在debain下只要执行apt-get install是一样的，当然要观察执行结果，是不是每个软件都顺利安装在你的系统上。<br>
-
-The smooth running script needs the following third party software:
 
 Installing these software under aurchlinux is as long as pacman-S ffmpeg FLAC shntool Unrar MAC enca cuetool metaflac is executed. As long as the apt-get install is the same under debain, of course, to observe the results of the execution, is not every software installed smoothly on your system. <br>
 
@@ -54,27 +53,27 @@ The internal functions of scripts and the use of <br>
 ---
 
 命令格式：  
-ape2flac.py -d <directory> -h -e -n  
--d --directory 需要执行的目录  
--h --help 帮助说明  
--e --earse 删除转换后的文件（压缩和音频文件）  
--n --notrans 不做音频文件转换，只做解压和文本文件编码转换  
-本脚本在指定的目录中完成如下操作：  
-1，解压缩rar文件，之所以不支持zip文件，是zip格式缺少编码信息，解压出来中文文件名可能是乱码。  
-2，将.txt和.cue文件的编码转换成UTF-8,如果发现cue文件中的FILE字段和实际文件不符，修改FILE字段
-3，转换'.ape','.flac','.wav','.wv'格式的文件到.flac文件，如果同一目录下有相同文件名的cue文件，将根据cue文件生成多个文件。同时将专辑、歌手、音轨、标题信息写入flac文件。
+ape2flac.py -d <directory> -h -e -n <br>
+-d --directory 需要执行的目录  <br>
+-h --help 帮助说明  <br>
+-e --earse 删除转换后的文件（压缩和音频文件）  <br>
+-n --notrans 不做音频文件转换，只做解压和文本文件编码转换  <br>
+本脚本在指定的目录中完成如下操作：  <br>
+1，解压缩rar文件，之所以不支持zip文件，是zip格式缺少编码信息，解压出来中文文件名可能是乱码。  <br>
+2，将.txt和.cue文件的编码转换成UTF-8,如果发现cue文件中的FILE字段和实际文件不符，修改FILE字段<br>
+3，转换'.ape','.flac','.wav','.wv'格式的文件到.flac文件，如果同一目录下有相同文件名的cue文件，将根据cue文件生成多个文件。同时将专辑、歌手、音轨、标题信息写入flac文件。<br>
 　　第一次执行可以用-n参数，让脚本只做前面两步，然后在根据情况调整一下目录结构，如有时候太目录太深等等，根据自己情况整理成比较合适的目录结构，然后在进行实际的转换。<br>  
 	
-Command format:
-Ape2flac.py -d <directory> -h -e -n
--d --directory directory to execute
--h --help help explain
--e --earse delete converted files (compressed and audio files)
--n --notrans does not convert audio files, only decompression and text file conversion.
-This script completes the following operations in the specified directory:
-1, decompression rar file, the reason does not support zip file, ZIP format is lack of coding information, decompressed Chinese file name may be scrambled code.
-2. Convert the encoding of. TXT and. cue files to UTF-8. If the FILE field in the cue file does not match the actual file, modify the FILE field
-3. Convert'. ape','. flac','. wav','. wv'files to. FLAC files. If a cue file with the same file name is in the same directory, multiple files will be generated from the cue file. At the same time, the album, singer, sound track and heading information are written to FLAC file.
+Command format:<br>
+Ape2flac.py -d <directory> -h -e -n<br>
+-d --directory directory to execute<br>
+-h --help help explain<br>
+-e --earse delete converted files (compressed and audio files)<br>
+-n --notrans does not convert audio files, only decompression and text file conversion.<br>
+This script completes the following operations in the specified directory:<br>
+1, decompression rar file, the reason does not support zip file, ZIP format is lack of coding information, decompressed Chinese file name may be scrambled code.<br>
+2. Convert the encoding of. TXT and. cue files to UTF-8. If the FILE field in the cue file does not match the actual file, modify the FILE field<br>
+3. Convert'. ape','. flac','. wav','. wv'files to. FLAC files. If a cue file with the same file name is in the same directory, multiple files will be generated from the cue file. At the same time, the album, singer, sound track and heading information are written to FLAC file.<br>
 The first execution uses the - n parameter, allowing the script to do only the first two steps, then adjust the directory structure according to the situation, such as sometimes too deep directory and so on, according to their own situation into a more appropriate directory structure, and then the actual conversion. <br>
 
 #后续设想<br>
