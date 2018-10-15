@@ -42,7 +42,11 @@ def Validate_filename(chname):  #命令行或者文件名中转义
 
 def Exec(cmd): #执行shell命令
     print(cmd)
-    (status,output) = subprocess.getstatusoutput(cmd)
+    try:
+        (status,output) = subprocess.getstatusoutput(cmd)
+    except UnicodeDecodeError:
+        print("UnicodeDecodeError......") #有时候会返回错误的unicode
+        status = 100
     if status !=0:
         print("error code:"+str(status))
     else:
@@ -95,11 +99,17 @@ def get_cue_info(cuefile):#获取cue文件的信息
         return tracknames
     
     for id3count in range(1,tracks+1):
+        martist = os.popen("cueprint -n"+str(id3count)+" -t '%p' "+cuefile).read() 
+        malbum  = os.popen("cueprint -n"+str(id3count)+" -t '%T' "+cuefile).read()
+        mtranknum  = os.popen("cueprint -n"+str(id3count)+" -t '%02n' "+cuefile).read()
+        mtitle  = os.popen("cueprint -n"+str(id3count)+" -t '%t' "+cuefile).read() 
+        if martist == "":
+            martist = os.popen("cueprint -n"+str(id3count)+" -t '%P' "+cuefile).read()      
         t_music = Music(
-        artist = os.popen("cueprint -n"+str(id3count)+" -t '%p' "+cuefile).read(),
-        album  = os.popen("cueprint -n"+str(id3count)+" -t '%T' "+cuefile).read(),
-        tranknum  = os.popen("cueprint -n"+str(id3count)+" -t '%02n' "+cuefile).read(),
-        title  = os.popen("cueprint -n"+str(id3count)+" -t '%t' "+cuefile).read()
+        artist = martist,
+        album  = malbum,
+        tranknum  = mtranknum,
+        title  = mtitle
         )
         '''
         artist[id3count]=$(cueprint -n$id3count -t ‘%p’ “$cuefile”)
