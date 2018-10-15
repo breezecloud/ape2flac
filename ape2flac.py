@@ -1,15 +1,17 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-#ape2flac.py version 0.1 by luping@shtel.com.cn
+#ape2flac.py version 0.2 by luping@shtel.com.cn
+#2018.10.15
 
-import commands,os,sys,getopt
+import os,sys,getopt,subprocess
 from collections import namedtuple
 import re
 
 
 help_txt = '''
 ape2flac.py -d <directory> -h -e -n
-translate music file('.ape','.flac','.wav','.wv') into flac formate and split  multi track if have .cue file
+translate music file('.ape','.flac','.wav','.wv') into flac formate and split  multi track if have .cue file.
+note:script must run in python3
 -d --directory work directory
 -h --help this help
 -e --earse original compress and music file
@@ -40,7 +42,7 @@ def Validate_filename(chname):  #命令行或者文件名中转义
 
 def Exec(cmd): #执行shell命令
     print(cmd)
-    (status,output) = commands.getstatusoutput(cmd)
+    (status,output) = subprocess.getstatusoutput(cmd)
     if status !=0:
         print("error code:"+str(status))
     else:
@@ -208,7 +210,7 @@ def main(argv):
     for path, dirs, files in os.walk(target_dir, topdown=False): 
         for file in files:
             file_ext = os.path.splitext(file)[1].lower() #文件后缀
-            if file_ext =='.rar':
+            if file_ext =='.rar':                
                 Uncompress(os.path.join(path,file),del_flag) #解压到当前目录并删除原文件
             if file_ext in ('.cue','.txt'): #.cue文件复制.cue.bak0-99；.txt文件复制为.txt.bak0-99
                 Backup_file(os.path.join(path,file))
@@ -224,7 +226,7 @@ def main(argv):
 
     #第三次遍历目录，正式转换
     if notrans_flag == False:
-        for path, dirs, files in os.walk(target_dir, topdown=False): #
+        for path, dirs, files in os.walk(target_dir, topdown=False): 
             print("enter "+path+" starting Convert...")
             for file in files:
                 file_ext = os.path.splitext(file)[1].lower() #文件后缀
@@ -236,4 +238,7 @@ def main(argv):
         sys.exit(0)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    if sys.version_info.major == 3:
+        main(sys.argv[1:])
+    else:
+        print("script must run in python3!")
