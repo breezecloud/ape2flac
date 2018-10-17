@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-#ape2flac.py version 0.2 by luping@shtel.com.cn
+#ape2flac.py version 0.3 by luping@shtel.com.cn
 #2018.10.15
 
 import os,sys,getopt,subprocess
@@ -9,13 +9,14 @@ import re
 
 
 help_txt = '''
-ape2flac.py -d <directory> -h -e -n
+ape2flac.py -d <directory> -h -e -n -o
 translate music file('.ape','.flac','.wav','.wv') into flac formate and split  multi track if have .cue file.
 note:script must run in python3
 -d --directory work directory
 -h --help this help
 -e --earse original compress and music file
 -n --notrans do not translate music file,uncompress and convert utf8 only
+-o --overwrite will overwrite existing files, otherwise it will skip existing files
 this script search gived dfirectory and do this job:
 1,uncompress .rar file with diregtory
 2,translate .txt and .cue file into encode UTF-8,older file weill backup like xxx.cue.bak0
@@ -28,6 +29,9 @@ cueprint script reference：https://www.xuebuyuan.com/105556.html?mobile=1
 '''
 
 Music = namedtuple('Music',['artist','album','tranknum','title']) #具名元组定义音乐
+del_flag = False
+notrans_flag = False
+overwrite_flag = False
 
 def Validate_char(chname): #非法字符转换为_,文件名不允许出现
     #rstr1 = r"[\/\\\:\*\?\"\<\>\|\(\)\']"  # '/ \ : * ? " < > |'
@@ -53,7 +57,10 @@ def Exec(cmd): #执行shell命令
         print("...ok")
     return status
 
-def Uncompress(file,del_flag): #解压rar，del_flag = True 解压后删除原文件
+def Uncompress(file): #解压rar，del_flag = True 解压后删除原文件
+    global del_flag
+    global notrans_flag
+    global overwrite_flag  
     file_ext = os.path.splitext(file)[1].lower() #文件后缀
     fname = os.path.splitext(file)[0] #无后缀文件名
     '''
@@ -99,12 +106,34 @@ def get_cue_info(cuefile):#获取cue文件的信息
         return tracknames
     
     for id3count in range(1,tracks+1):
-        martist = os.popen("cueprint -n"+str(id3count)+" -t '%p' "+cuefile).read() 
-        malbum  = os.popen("cueprint -n"+str(id3count)+" -t '%T' "+cuefile).read()
-        mtranknum  = os.popen("cueprint -n"+str(id3count)+" -t '%02n' "+cuefile).read()
-        mtitle  = os.popen("cueprint -n"+str(id3count)+" -t '%t' "+cuefile).read() 
+        try:
+            martist = os.popen("cueprint -n"+str(id3count)+" -t '%p' "+cuefile).read() 
+        except UnicodeDecodeError:
+            print("cueprint error in parse artist of "+cuefile)
+            martist = ""
+        try:
+            malbum  = os.popen("cueprint -n"+str(id3count)+" -t '%T' "+cuefile).read()
+        except UnicodeDecodeError:
+            print("cueprint error in parse album of "+cuefile)
+            malbum = "" 
+        try:
+            mtranknum  = os.popen("cueprint -n"+str(id3count)+" -t '%02n' "+cuefile).read()
+        except UnicodeDecodeError:
+            print("cueprint error in parse tranknum of "+cuefile)
+            mtranknum = ""                             
+        try:
+            mtitle  = os.popen("cueprint -n"+str(id3count)+" -t '%t' "+cuefile).read() 
+        except UnicodeDecodeError:
+            print("cueprint error in parse title of "+cuefile)
+            mtitle = ""         
+        
         if martist == "":
-            martist = os.popen("cueprint -n"+str(id3count)+" -t '%P' "+cuefile).read()      
+            try:
+                martist = os.popen("cueprint -n"+str(id3count)+" -t '%P' "+cuefile).read()  
+            except UnicodeDecodeError:
+                print("cueprint error in parse title of "+cuefile)
+                mtitle = ""              
+                 
         t_music = Music(
         artist = martist,
         album  = malbum,
@@ -135,7 +164,10 @@ def Set_cue_flac(file,cuefile):#设置id3v2到flac文件
         Write_id3v2(file+"-"+('0'+str(tracknum+1))[-2:]+'.flac','TRACKNUM='+tracknames[tracknum].tranknum)
         Write_id3v2(file+"-"+('0'+str(tracknum+1))[-2:]+'.flac','TITLE='+tracknames[tracknum].title)
 
-def Convert_flac(file,del_flag): #转换音频文件为flac，del_flag = True 解压后删除原文件
+def Convert_flac(file): #转换音频文件为flac，del_flag = True 解压后删除原文件
+    global del_flag
+    global notrans_flag
+    global overwrite_flag  
     success_flag = False
     fname = os.path.splitext(file)[0] #无后缀文件名
     cuefile = "" 
@@ -158,37 +190,54 @@ def Convert_flac(file,del_flag): #转换音频文件为flac，del_flag = True �
         filename = Validate_char(filename[:240])
         #有些cue文件的file字段和实际文件不匹配
         Convert_filename(cuefile,os.path.basename(file))
+        #是否要覆盖原文件
+        overwrite = 'never'
+        if overwrite_flag == True:
+            overwrite = 'always'
         #shntool split -t "%n.%p.%t" -f test.cue -o flac test. -d output
         #if Exec('shntool split -t "%n.%p.%t" -f "' + os.path.join(path,file)+'.cue"' + ' -o flac -O always "' +os.path.join(path,file)+'" -d "'+path+'"') == 0:
-        if Exec('shntool split -t '+Validate_filename(filename)+'-%n -f ' + Validate_filename(cuefile)+' -o flac -O always '+Validate_filename(file)+' -d '+Validate_filename(os.path.dirname(file))) == 0:
+        if Exec('shntool split -t '+Validate_filename(filename)+'-%n -f ' + Validate_filename(cuefile)+' -o flac -O '+overwrite+' '+Validate_filename(file)+' -d '+Validate_filename(os.path.dirname(file))) == 0:
             success_flag = True
+        else:
+            if overwrite_flag == False:
+             success_flag = True # overwrite==never 也会返回错误
             #flac文件写入id[3]v2
             Set_cue_flac(os.path.split(fname)[0]+os.sep+filename,cuefile)
     elif os.path.splitext(file)[1] != '.flac' :#找不到cue文件,转换为单个文件
-        # ffmpeg -i test.ape  test.flac
-        if Exec('ffmpeg -y -i '+Validate_filename(file) + ' ' + Validate_filename(fname)+'.flac') == 0:
-            success_flag = True
+        if (overwrite_flag == True) or (os.path.exists(fname+'.flac') == False):
+            # ffmpeg -i test.ape  test.flac
+            if Exec('ffmpeg -y -i '+Validate_filename(file) + ' ' + Validate_filename(fname)+'.flac') == 0:
+                success_flag = True
+        else:
+            success_flag = True 
                 
     if (del_flag) == True and (success_flag == True):
         os.remove(file)
 
-def Convert_ape2flac(file,del_flag):#直接ape转flac，del_flag = True 解压后删除原文件
+def Convert_ape2flac(file):#直接ape转flac，del_flag = True 解压后删除原文件
+    global del_flag
+    global notrans_flag
+    global overwrite_flag  
     file_ext = os.path.splitext(file)[1].lower()
     success_flag = False
     fname = os.path.splitext(file)[0] #无后缀文件名 
     if file_ext == '.ape':
-        if Exec('ffmpeg -y -i '+Validate_filename(file) + ' ' + Validate_filename(fname+'.flac')) == 0:
+        if (overwrite_flag == True) or  (os.path.exists(fname+'.flac') == False):
+            if Exec('ffmpeg -y -i '+Validate_filename(file) + ' ' + Validate_filename(fname+'.flac')) == 0:
+                success_flag = True
+        else:
             success_flag = True
     if (del_flag) == True and (success_flag == True):
         os.remove(file)        
 
 def main(argv):
+    global del_flag
+    global notrans_flag
+    global overwrite_flag  
     #处理命令行参数
-    del_flag = False
-    notrans_flag = False
     target_dir = ""
     try:
-        opts, args = getopt.getopt(argv,"hend:",["help","earse","notrans","directory="])
+        opts, args = getopt.getopt(argv,"henod:",["help","earse","notrans","overwrite","directory="])
     except getopt.GetoptError:
         print(help_txt)
         sys.exit(2)       
@@ -204,7 +253,9 @@ def main(argv):
         if opt in ("-e","--earse"):
             del_flag = True
         if opt in ("-n","--notrans"): 
-            notrans_flag = True     
+            notrans_flag = True
+        if opt in ("-o","--overwrite"):
+            overwrite_flag = True    
     if target_dir == "":
         print(help_txt)
         sys.exit()        
@@ -221,7 +272,7 @@ def main(argv):
         for file in files:
             file_ext = os.path.splitext(file)[1].lower() #文件后缀
             if file_ext =='.rar':                
-                Uncompress(os.path.join(path,file),del_flag) #解压到当前目录并删除原文件
+                Uncompress(os.path.join(path,file)) #解压到当前目录并删除原文件
             if file_ext in ('.cue','.txt'): #.cue文件复制.cue.bak0-99；.txt文件复制为.txt.bak0-99
                 Backup_file(os.path.join(path,file))
 
@@ -232,7 +283,7 @@ def main(argv):
             if file_ext in ('.txt','.cue'):
                 Convert_utf8(os.path.join(path,file))
             if file_ext == '.ape': #基于mac和shntool的ape转换flac发现有些ape文件无法转换(可能和ape压缩版本有关)，所以提前转换成flac
-                Convert_ape2flac(os.path.join(path,file),del_flag)
+                Convert_ape2flac(os.path.join(path,file))
 
     #第三次遍历目录，正式转换
     if notrans_flag == False:
@@ -242,7 +293,7 @@ def main(argv):
                 file_ext = os.path.splitext(file)[1].lower() #文件后缀
                 #if file_ext in ('.ape','.flac','.wav','.m4a','.mp3','.wv'): #暂时不转换m4a和mp3，转换结果太大
                 if file_ext in ('.flac','.wav','.wv'): #找到需要处理文件
-                    Convert_flac(os.path.join(path,file),del_flag)    
+                    Convert_flac(os.path.join(path,file))    
             print("leave "+path+" Convert done.")
         #exit
         sys.exit(0)
