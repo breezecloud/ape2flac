@@ -58,6 +58,7 @@ ape2flac.py -d <directory> -h -e -n <br>
 -h --help 帮助说明  <br>
 -e --earse 删除转换后的文件（压缩和音频文件）  <br>
 -n --notrans 不做音频文件转换，只做解压和文本文件编码转换  <br>
+-o --overwrite 覆盖已存在的文件<br>
 本脚本在指定的目录中完成如下操作：  <br>
 1，解压缩rar文件，之所以不支持zip文件，是zip格式缺少编码信息，解压出来中文文件名可能是乱码。  <br>
 2，将.txt和.cue文件的编码转换成UTF-8,如果发现cue文件中的FILE字段和实际文件不符，修改FILE字段<br>
@@ -70,6 +71,7 @@ Ape2flac.py -d <directory> -h -e -n<br>
 -h --help help explain<br>
 -e --earse delete converted files (compressed and audio files)<br>
 -n --notrans does not convert audio files, only decompression and text file conversion.<br>
+-o --overwrite overwrite exist file
 This script completes the following operations in the specified directory:<br>
 1, decompression rar file, the reason does not support zip file, ZIP format is lack of coding information, decompressed Chinese file name may be scrambled code.<br>
 2. Convert the encoding of. TXT and. cue files to UTF-8. If the FILE field in the cue file does not match the actual file, modify the FILE field<br>
