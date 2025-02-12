@@ -9,8 +9,9 @@ The ape2flac script acts on<br>
 Change log<br>
 ======
 
-[2025.2] 1. 废弃了enca命令字符便码转换，改为iconv命令转换，并增加了字符便码自动识别功能。2. 增加了日志功能，在运行目录下新建ape2flac.log以记录运行过程。3. 修正了一些bug
-[2025.2] 1. Abandoned the conversion of enca command character codes and replaced it with iconv command conversion, and added automatic recognition function for character codes. 2. Added logging function, creating ape2flac.log in the running directory to record the running process. 3. fix some bug
+[2025.2] 
+1. 废弃了使用enca命令进行字符编码码转换，改为iconv命令转换，并增加了字符编码自动识别功能。2. 增加了日志功能，在运行目录下生成ape2flac.log日志文件以记录运行过程。3. 修正了一些bug
+1. Abandoned the use of the Enca command for character encoding code conversion and replaced it with the Iconv command conversion, and added automatic character encoding recognition function. 2. Added logging function, generating ape2flac.log log files in the running directory to record the running process. 3. Fixed some bugs
 
 为何要使用flac格式<br>
 Why use FLAC format <br>
