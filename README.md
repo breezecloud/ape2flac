@@ -5,6 +5,13 @@ The ape2flac script acts on<br>
   批量将ape，wav，wx音频文件转换成flac文件，如果有cue分轨文件，将这些文件分割成单独的flac文件，同时将cue文件里的专辑、歌手、音轨、标题信息写入flac文件。脚本下载：https://github.com/breezecloud/ape2flac<br>
   Batch the ape, wav, Wx audio files into FLAC files, if there is a cue file, these files are divided into separate FLAC files, while the cue file album, singer, tracknum, title information written in the FLAC file. Script Download: https://github.com/breezecloud/ape2flac<br>
 
+修改日志<br>
+Change log<br>
+======
+
+[2025.2] 1. 废弃了enca命令字符便码转换，改为iconv命令转换，并增加了字符便码自动识别功能。2. 增加了日志功能，在运行目录下新建ape2flac.log以记录运行过程。3. 修正了一些bug
+[2025.2] 1. Abandoned the conversion of enca command character codes and replaced it with iconv command conversion, and added automatic recognition function for character codes. 2. Added logging function, creating ape2flac.log in the running directory to record the running process. 3. fix some bug
+
 为何要使用flac格式<br>
 Why use FLAC format <br>
 ======
@@ -29,7 +36,7 @@ Third party software <br>
 3，shntool，cue切割软件  <br>
 4，unrar，rar文件解压  <br>
 5，mac，Monkey's Audio Console，支持ape文件格式  <br>
-6，enca，将文件转换成utf-8格式 <br>
+6，iconv，将文件转换成utf-8格式 <br>
 7，sed，修改cue文件<br>
 8，cuetools，支持读取cue文件<br>
 9，metaflac，支持写入flac的id[3]v2标记<br>
@@ -39,21 +46,21 @@ The smooth running script needs the following third party software:
 3, shntool, cue cutting software<br>
 4, Unrar, rar file decompression<br>
 5, MAC, Monkey's Audio Console, support ape file format<br>
-6, enca, convert files to UTF-8 format.<br>
+6, iconv, convert files to UTF-8 format.<br>
 7, SED, modify the cue file.<br>
 8, cuetools, support reading cue files<br>
 9, metaflac, supporting id[3]v2 tags written to FLAC.<br>
 
-安装这些软件在aurchlinux下只要执行pacman -S ffmpeg flac shntool unrar mac enca cuetool metaflac。在debain下只要执行apt-get install是一样的，当然要观察执行结果，是不是每个软件都顺利安装在你的系统上。<br>
+安装这些软件在aurchlinux下只要执行pacman -S ffmpeg flac shntool unrar mac  cuetool metaflac。在debain下只要执行apt-get install是一样的，当然要观察执行结果，是不是每个软件都顺利安装在你的系统上。在最近的debian版本上metaflac好像已经整合在flac包了，不需要单独安装metaflac，但不知道archlinux是否相同。另外iconv命令安装不同系统可能不同安装，在debian中是按照gawk包<br>
 
-Installing these software under aurchlinux is as long as pacman-S ffmpeg FLAC shntool Unrar MAC enca cuetool metaflac is executed. As long as the apt-get install is the same under debain, of course, to observe the results of the execution, is not every software installed smoothly on your system. <br>
+Installing these software under aurchlinux is as long as pacman-S ffmpeg FLAC shntool Unrar MAC  cuetool metaflac is executed. As long as the apt-get install is the same under debain, of course, to observe the results of the execution, is not every software installed smoothly on your system.In the recent debian version, it seems that MetaFlac has been integrated into the Flac package, and there is no need to install MetaFlac separately, but I am not sure if ArchLinux is the same.In addition, the iconv command may be installed differently for different systems. In debian, it is installed according to the gawk package<br>
 
 脚本的内部功能和使用<br>
 The internal functions of scripts and the use of <br>
 ---
 
 命令格式：  
-ape2flac.py -d <directory> -h -e -n <br>
+ape2flac.py -d <directory> -h -e -n -o <br>
 -d --directory 需要执行的目录  <br>
 -h --help 帮助说明  <br>
 -e --earse 删除转换后的文件（压缩和音频文件）  <br>
@@ -66,14 +73,14 @@ ape2flac.py -d <directory> -h -e -n <br>
 　　第一次执行可以用-n参数，让脚本只做前面两步，然后在根据情况调整一下目录结构，如有时候太目录太深等等，根据自己情况整理成比较合适的目录结构，然后在进行实际的转换。<br>  
 	
 Command format:<br>
-Ape2flac.py -d <directory> -h -e -n<br>
+Ape2flac.py -d <directory> -h -e -n -o <br>
 -d --directory directory to execute<br>
 -h --help help explain<br>
 -e --earse delete converted files (compressed and audio files)<br>
 -n --notrans does not convert audio files, only decompression and text file conversion.<br>
 -o --overwrite overwrite exist file
 This script completes the following operations in the specified directory:<br>
-1, decompression rar file, the reason does not support zip file, ZIP format is lack of coding information, decompressed Chinese file name may be scrambled code.<br>
+1. decompression rar file, the reason does not support zip file, ZIP format is lack of coding information, decompressed Chinese file name may be scrambled code.<br>
 2. Convert the encoding of. TXT and. cue files to UTF-8. If the FILE field in the cue file does not match the actual file, modify the FILE field<br>
 3. Convert'. ape','. flac','. wav','. wv'files to. FLAC files. If a cue file with the same file name is in the same directory, multiple files will be generated from the cue file. At the same time, the album, singer, sound track and heading information are written to FLAC file.<br>
 The first execution uses the - n parameter, allowing the script to do only the first two steps, then adjust the directory structure according to the situation, such as sometimes too deep directory and so on, according to their own situation into a more appropriate directory structure, and then the actual conversion. <br>
