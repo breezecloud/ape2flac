@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: UTF-8 -*-
-#ape2flac.py version 0.3 by luping@shtel.com.cn
+#ape2flac.py version 0.4 by luping.sh@chinatelecom.cn
 #2018.10.15
 
 import os,sys,getopt,subprocess
@@ -264,7 +264,7 @@ def main(argv):
     cmds = ('ffmpeg -version','flac -version','shntool -v','unrar -v','enca -v','sed --version','metaflac --version','cueprint --version')
     for cmd in cmds:
         if Exec(cmd) != 0:
-            print("one of cmomand is not run correct,run ape2flac.py -h for help")
+            print("one of cmmand is not run correct,run ape2flac.py -h for help")
             sys.exit(1)
 
     #第一次遍历目录，解压zip、rar，并移除原压缩文件;2,将cue和txt文件编码转换成UTF-8,将'.cue'文件备份为‘.cue.bak0-99’
