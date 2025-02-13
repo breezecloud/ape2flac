@@ -60,12 +60,14 @@ def Validate_filename(chname):  #命令行或者文件名中转义
     return chname
 
 def Exec(cmd,show_msg=True): #执行shell命令
-    logger.info(f"exe \"{cmd}\"")
+    if show_msg:
+        logger.info(f"exe \"{cmd}\"")
     try:
         (status,output) = subprocess.getstatusoutput(cmd)
     except UnicodeDecodeError:
-        logger.warning("UnicodeDecodeError......") #有时候会返回错误的unicode
-        status = 100
+        if show_msg:
+            logger.error("...UnicodeDecodeError") #有时候会返回错误的unicode
+        return 100
     if status !=0:
         if show_msg:
             logger.error(f"......failed error code:{status} {output}")
@@ -100,9 +102,18 @@ def Convert_utf8(file_name): #转换编码为utf8
         result = chardet.detect(raw_data)
         encoding = result['encoding']
     v_filename = Validate_filename(file_name)
-    if encoding != 'utf-8':
-        if Exec(f'iconv -f {encoding} -t utf-8 {v_filename} -o {v_filename}',False) != 0:
-            Exec(f'iconv -f GBK -t utf-8 {v_filename} -o {v_filename}') #转换失败，最后测试一下GBK是否成功
+    file_ext = os.path.splitext(file_name)[1].lower() #文件后缀
+    if encoding not in ('utf-8','ascii'):
+        if Exec(f'iconv -f {encoding} -t utf-8 {v_filename} > /dev/null',False) == 0:
+            Exec(f'iconv -f {encoding} -t utf-8 {v_filename} -o {v_filename}')
+        else:
+            if Exec(f'iconv -f GBK -t utf-8 {v_filename} > /dev/null',False) == 0:
+                Exec(f'iconv -f GBK -t utf-8 {v_filename} -o {v_filename}') #最后试一下GBK是否成功
+            else:
+                if file_ext == '.cue':
+                    logger.error(f"{file_name} convert utf8 failed")
+                else:
+                    logger.warning(f"{file_name} convert utf8 failed")
 
 def Backup_file(file):#复制文件生成.cue.bak1-99
     for i in range(100):
