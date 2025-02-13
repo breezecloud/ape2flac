@@ -59,16 +59,19 @@ def Validate_filename(chname):  #命令行或者文件名中转义
         chname = chname.replace(achar,'\\' + achar)
     return chname
 
-def Exec(cmd): #执行shell命令
+def Exec(cmd,show_msg=True): #执行shell命令
+    logger.info(f"exe \"{cmd}\"")
     try:
         (status,output) = subprocess.getstatusoutput(cmd)
     except UnicodeDecodeError:
         logger.warning("UnicodeDecodeError......") #有时候会返回错误的unicode
         status = 100
     if status !=0:
-        logger.error(f"exe \"{cmd}\" error code:"+str(status))
+        if show_msg:
+            logger.error(f"......failed error code:{status} {output}")
     else:
-        logger.info(f"exe \"{cmd}\"......ok")
+        if show_msg:
+            logger.info("...ok")
     return status
 
 def Uncompress(file): #解压rar，del_flag = True 解压后删除原文件
@@ -98,7 +101,8 @@ def Convert_utf8(file_name): #转换编码为utf8
         encoding = result['encoding']
     v_filename = Validate_filename(file_name)
     if encoding != 'utf-8':
-        Exec(f'iconv -f {encoding} -t utf-8 {v_filename} -o {v_filename}')
+        if Exec(f'iconv -f {encoding} -t utf-8 {v_filename} -o {v_filename}',False) != 0:
+            Exec(f'iconv -f GBK -t utf-8 {v_filename} -o {v_filename}') #转换失败，最后测试一下GBK是否成功
 
 def Backup_file(file):#复制文件生成.cue.bak1-99
     for i in range(100):
@@ -130,29 +134,29 @@ def get_cue_info(cuefile):#获取cue文件的信息
         try:
             martist = os.popen("cueprint -n"+str(id3count)+" -t '%p' "+cuefile).read() 
         except UnicodeDecodeError:
-            logger.error("cueprint error in parse artist of "+cuefile)
+            logger.warning("cueprint error in parse artist of "+cuefile)
             martist = ""
         try:
             malbum  = os.popen("cueprint -n"+str(id3count)+" -t '%T' "+cuefile).read()
         except UnicodeDecodeError:
-            logger.error("cueprint error in parse album of "+cuefile)
+            logger.warning("cueprint error in parse album of "+cuefile)
             malbum = "" 
         try:
             mtranknum  = os.popen("cueprint -n"+str(id3count)+" -t '%02n' "+cuefile).read()
         except UnicodeDecodeError:
-            logger.error("cueprint error in parse tranknum of "+cuefile)
+            logger.warning("cueprint error in parse tranknum of "+cuefile)
             mtranknum = ""                             
         try:
             mtitle  = os.popen("cueprint -n"+str(id3count)+" -t '%t' "+cuefile).read() 
         except UnicodeDecodeError:
-            logger.error("cueprint error in parse title of "+cuefile)
+            logger.warning("cueprint error in parse title of "+cuefile)
             mtitle = ""         
         
         if martist == "":
             try:
                 martist = os.popen("cueprint -n"+str(id3count)+" -t '%P' "+cuefile).read()  
             except UnicodeDecodeError:
-                logger.error("cueprint error in parse title of "+cuefile)
+                logger.warning("cueprint error in parse title of "+cuefile)
                 mtitle = ""              
                  
         t_music = Music(
@@ -288,39 +292,41 @@ def main(argv):
         if Exec(cmd) != 0:
             print(f"{cmd} is not run correct,run ape2flac.py -h for help")
             sys.exit(1)
-    #第一次遍历目录，解压zip、rar，并移除原压缩文件;2,将cue和txt文件编码转换成UTF-8,将'.cue'文件备份为‘.cue.bak0-99’
-    for path, dirs, files in os.walk(target_dir, topdown=False): 
+    totle_dir = 0
+    #统计一共多少目录
+    for path, dirs, files in os.walk(target_dir, topdown=True): 
+        totle_dir += 1
+    logger.info(f"totle have {totle_dir} directorys")
+    count_dir = 0
+    for path, dirs, files in os.walk(target_dir, topdown=True):
+        count_dir += 1
+        logger.info(f"===>{count_dir}/{totle_dir} [{path}] ")
+        #第一次遍历目录，解压zip、rar，并移除原压缩文件;2,将cue和txt文件编码转换成UTF-8,将'.cue'文件备份为‘.cue.bak0-99’ 
         for file in files:
             file_ext = os.path.splitext(file)[1].lower() #文件后缀
             if file_ext =='.rar':                
                 Uncompress(os.path.join(path,file)) #解压到当前目录并删除原文件
             if file_ext in ('.cue','.txt'): #.cue文件复制.cue.bak0-99；.txt文件复制为.txt.bak0-99
                 Backup_file(os.path.join(path,file))
-
-    #第二次遍历目录，将cue和txt文件编码转换成UTF-8
-    for path, dirs, files in os.walk(target_dir, topdown=False): 
+        #第二次遍历目录，将cue和txt文件编码转换成UTF-8 
         for file in files:
             file_ext = os.path.splitext(file)[1].lower() #文件后缀  
             if file_ext in ('.txt','.cue'):
                 Convert_utf8(os.path.join(path,file))
             if notrans_flag == False and file_ext == '.ape': #基于mac和shntool的ape转换flac发现有些ape文件无法转换(可能和ape压缩版本有关)，所以提前转换成flac
                 Convert_ape2flac(os.path.join(path,file))
-
-    #第三次遍历目录，正式转换
-    if notrans_flag == False:
-        for path, dirs, files in os.walk(target_dir, topdown=False): 
-            logger.info("enter "+path+" starting Convert...")
+        #第三次遍历目录，正式转换
+        if notrans_flag == False:
             for file in files:
                 file_ext = os.path.splitext(file)[1].lower() #文件后缀
                 #if file_ext in ('.ape','.flac','.wav','.m4a','.mp3','.wv'): #暂时不转换m4a和mp3，转换结果太大
                 if file_ext in ('.flac','.wav','.wv'): #找到需要处理文件
                     Convert_flac(os.path.join(path,file))    
-            logger.info("leave "+path+" Convert done.")
-        #exit
-        sys.exit(0)
 
 if __name__ == "__main__":
     if sys.version_info.major == 3:
         main(sys.argv[1:])
+        sys.exit(0)
     else:
         print("script must run in python3!")
+        sys.exit(1)
