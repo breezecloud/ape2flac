@@ -9,9 +9,8 @@ The ape2flac script acts on<br>
 Change log<br>
 ======
 
-[2025.2] 
-1. 废弃了使用enca命令进行字符编码码转换，改为iconv命令转换，并增加了字符编码自动识别功能。2. 增加了日志功能，在运行目录下生成ape2flac.log日志文件以记录运行过程。3. 修正了一些bug
-1. Abandoned the use of the Enca command for character encoding code conversion and replaced it with the Iconv command conversion, and added automatic character encoding recognition function. 2. Added logging function, generating ape2flac.log log files in the running directory to record the running process. 3. Fixed some bugs
+[2025.2] 1. 废弃了enca命令字符便码转换，改为iconv命令转换，并增加了字符便码自动识别功能。2. 增加了日志功能，在运行目录下新建ape2flac.log以记录运行过程。3. 修正了一些bug
+[2025.2] 1. Abandoned the conversion of enca command character codes and replaced it with iconv command conversion, and added automatic recognition function for character codes. 2. Added logging function, creating ape2flac.log in the running directory to record the running process. 3. fix some bug
 
 为何要使用flac格式<br>
 Why use FLAC format <br>
@@ -72,6 +71,7 @@ ape2flac.py -d <directory> -h -e -n -o <br>
 2，将.txt和.cue文件的编码转换成UTF-8,如果发现cue文件中的FILE字段和实际文件不符，修改FILE字段<br>
 3，转换'.ape','.flac','.wav','.wv'格式的文件到.flac文件，如果同一目录下有相同文件名的cue文件，将根据cue文件生成多个文件。同时将专辑、歌手、音轨、标题信息写入flac文件。<br>
 　　第一次执行可以用-n参数，让脚本只做前面两步，然后在根据情况调整一下目录结构，如有时候太目录太深等等，根据自己情况整理成比较合适的目录结构，然后在进行实际的转换。<br>  
+脚本在运行目录下生成ape2flac.log记录运行的过程，默认情况下只记录级别为INFO，如要修改成DEBUG模式，请修改源程序:logger.setLevel(logging.DEBUG)。<br>  
 	
 Command format:<br>
 Ape2flac.py -d <directory> -h -e -n -o <br>
@@ -84,7 +84,8 @@ This script completes the following operations in the specified directory:<br>
 1. decompression rar file, the reason does not support zip file, ZIP format is lack of coding information, decompressed Chinese file name may be scrambled code.<br>
 2. Convert the encoding of. TXT and. cue files to UTF-8. If the FILE field in the cue file does not match the actual file, modify the FILE field<br>
 3. Convert'. ape','. flac','. wav','. wv'files to. FLAC files. If a cue file with the same file name is in the same directory, multiple files will be generated from the cue file. At the same time, the album, singer, sound track and heading information are written to FLAC file.<br>
-The first execution uses the - n parameter, allowing the script to do only the first two steps, then adjust the directory structure according to the situation, such as sometimes too deep directory and so on, according to their own situation into a more appropriate directory structure, and then the actual conversion. <br>
+  The first execution uses the - n parameter, allowing the script to do only the first two steps, then adjust the directory structure according to the situation, such as sometimes too deep directory and so on, according to their own situation into a more appropriate directory structure, and then the actual conversion. <br>
+  The script generates an ape2flac.log file in the running directory to record the running process. By default, only logs at the INFO level are recorded. If you want to change it to the DEBUG mode, please modify the source code.:logger.setLevel(logging.DEBUG).<br>
 
 #后续设想<br>
 Follow up plan for <br>

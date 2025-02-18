@@ -3,7 +3,7 @@
 #ape2flacbat.py version 0.1 by luping.sh@chinatelecom.cn
 #2024.4.5
 #对应ape2flacbat脚本，可以将转换好的flac复制到原目录，并且删除原理的ape文件
-
+ 
 import os,sys,subprocess,logging
 def Exec(cmd): #执行shell命令
     print(cmd)
